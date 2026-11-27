@@ -66,5 +66,5 @@ Compare your own result with a solution: `git diff main..solution/lesson-02-stat
 
 ## Requirements
 
-- Node.js 22 or newer
+- Node.js 22.18 or newer (or 24.11 or newer); check with `node -v`
 - Claude Code or OpenCode, with at least a Claude Pro subscription or API access
