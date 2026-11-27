@@ -17,16 +17,20 @@ else
   echo "✓ generated types match docs/api.yaml"
 fi
 
-# 2. No new dependencies without approval
-if echo "$changed" | grep -qx 'package.json'; then
-  added=$(git diff "$base"...HEAD -- package.json | grep -E '^\+\s+"[^"]+": "\^?[0-9~]' || true)
-  if [ -n "$added" ] && [ "${ALLOW_NEW_DEPS:-false}" != "true" ]; then
-    echo "✗ dependencies changed without the new-dependency label:"; echo "$added"; fail=1
-  else
-    echo "✓ dependencies"
-  fi
+# 2. No new dependencies without approval (compares dependency names, not lines)
+added=$(node -e '
+  const { execSync } = require("node:child_process")
+  const read = (ref) => { try { return JSON.parse(execSync(`git show ${ref}:package.json`, { encoding: "utf8" })) } catch { return {} } }
+  const names = (p) => new Set([...Object.keys(p.dependencies ?? {}), ...Object.keys(p.devDependencies ?? {})])
+  const before = names(read(process.argv[1])), after = names(read("HEAD"))
+  console.log([...after].filter((n) => !before.has(n)).join(" "))
+' "$(git merge-base "$base" HEAD)")
+if [ -n "$added" ] && [ "${ALLOW_NEW_DEPS:-false}" != "true" ]; then
+  echo "✗ new dependencies without the new-dependency label: $added"; fail=1
+elif [ -n "$added" ]; then
+  echo "✓ new dependencies approved by label: $added"
 else
-  echo "✓ dependencies unchanged"
+  echo "✓ no new dependencies"
 fi
 
 # 3. No focused or skipped tests added
