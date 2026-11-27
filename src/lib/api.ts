@@ -1,4 +1,4 @@
-import type { TestRun } from './types'
+import type { TestHistory, TestRun } from './types'
 
 export class ApiError extends Error {
   constructor(public readonly status: number, message: string) {
@@ -18,4 +18,9 @@ async function getJson<T>(path: string): Promise<T> {
 /** GET /api/runs: the test runs of the latest pipeline run. */
 export function fetchRuns(): Promise<TestRun[]> {
   return getJson<TestRun[]>('/api/runs')
+}
+
+/** GET /api/history: the latest runs per test file, newest first. */
+export function fetchHistory(limit = 20): Promise<TestHistory[]> {
+  return getJson<TestHistory[]>(`/api/history?limit=${limit}`)
 }

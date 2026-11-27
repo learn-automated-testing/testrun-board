@@ -19,3 +19,30 @@ export function passRate(runs: readonly { status: 'passed' | 'failed' }[]): numb
 export function formatPassRate(rate: number | null): string {
   return rate === null ? 'n/a' : `${(rate * 100).toFixed(1)}%`
 }
+
+export type SortDirection = 'ascending' | 'descending'
+
+/**
+ * Sorts runs by pass rate. Ascending puts the lowest pass rate first.
+ * Runs without a pass rate (null or unknown) always come last. Ties keep their order.
+ */
+export function sortByPassRate<T extends { file: string }>(
+  runs: readonly T[],
+  rates: Readonly<Record<string, number | null>>,
+  direction: SortDirection,
+): T[] {
+  const sign = direction === 'ascending' ? 1 : -1
+  return [...runs].sort((a, b) => {
+    const ra = rates[a.file] ?? null
+    const rb = rates[b.file] ?? null
+    if (ra === null && rb === null) return 0
+    if (ra === null) return 1
+    if (rb === null) return -1
+    return sign * (ra - rb)
+  })
+}
+
+/** Pass rate per test file. */
+export function passRatesByFile(histories: readonly { file: string; runs: readonly { status: 'passed' | 'failed' }[] }[]): Record<string, number | null> {
+  return Object.fromEntries(histories.map((h) => [h.file, passRate(h.runs)]))
+}

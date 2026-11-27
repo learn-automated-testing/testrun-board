@@ -13,3 +13,14 @@ export interface TestRunDto {
   durationMs: number
   startedAt: string
 }
+
+export interface HistoryEntry {
+  runId: string
+  status: "passed" | "failed"
+  startedAt: string
+}
+
+export interface TestHistory {
+  file: string
+  runs: HistoryEntry[]
+}

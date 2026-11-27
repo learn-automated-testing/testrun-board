@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { formatPassRate, passRate } from '../../src/lib/history'
+import { formatPassRate, passRate, passRatesByFile, sortByPassRate } from '../../src/lib/history'
+import { history } from '../mocks/data'
 
 const runs = (pattern: string) =>
   [...pattern].map((c) => ({ status: c === 'P' ? ('passed' as const) : ('failed' as const) }))
@@ -35,5 +36,38 @@ describe('formatPassRate', () => {
 
   it('shows n/a when there is no pass rate', () => {
     expect(formatPassRate(null)).toBe('n/a')
+  })
+})
+
+describe('sortByPassRate', () => {
+  const rows = [{ file: 'a' }, { file: 'b' }, { file: 'c' }, { file: 'd' }, { file: 'e' }]
+  const rates = { a: 1, b: 0.7, c: null, d: 0.85, e: 1 }
+
+  it('puts the lowest pass rate first and n/a last when ascending', () => {
+    expect(sortByPassRate(rows, rates, 'ascending').map((r) => r.file)).toEqual(['b', 'd', 'a', 'e', 'c'])
+  })
+
+  it('puts the highest pass rate first and still n/a last when descending', () => {
+    expect(sortByPassRate(rows, rates, 'descending').map((r) => r.file)).toEqual(['a', 'e', 'd', 'b', 'c'])
+  })
+
+  it('treats files without history as n/a and does not mutate the input', () => {
+    const input = [{ file: 'unknown' }, { file: 'b' }]
+    expect(sortByPassRate(input, rates, 'ascending').map((r) => r.file)).toEqual(['b', 'unknown'])
+    expect(input.map((r) => r.file)).toEqual(['unknown', 'b'])
+  })
+})
+
+describe('passRatesByFile', () => {
+  it('calculates the pass rate for every test file in the fixture', () => {
+    expect(passRatesByFile(history)).toEqual({
+      'checkout.spec.ts': 1,
+      'login.spec.ts': 0.85,
+      'cart-totals.test.ts': 1,
+      'search.spec.ts': 0.75,
+      'api-orders.test.ts': 0.95,
+      'profile.spec.ts': 0.7,
+      'pricing.test.ts': null,
+    })
   })
 })
