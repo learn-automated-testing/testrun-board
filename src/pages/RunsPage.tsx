@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { fetchRuns } from '../lib/api'
-import { sortByStartedAt } from '../lib/runs'
+import { countByStatus, filterByStatus, parseStatusFilter, sortByStartedAt, type StatusFilter as Filter } from '../lib/runs'
 import type { TestRun } from '../lib/types'
 import { RunsTable } from '../components/RunsTable'
+import { StatusFilter } from '../components/StatusFilter'
 
 type State =
   | { kind: 'loading' }
@@ -11,6 +12,17 @@ type State =
 
 export function RunsPage() {
   const [state, setState] = useState<State>({ kind: 'loading' })
+  const [filter, setFilter] = useState<Filter>(() =>
+    parseStatusFilter(new URLSearchParams(window.location.search).get('status')),
+  )
+
+  function changeFilter(next: Filter) {
+    setFilter(next)
+    const url = new URL(window.location.href)
+    if (next === 'all') url.searchParams.delete('status')
+    else url.searchParams.set('status', next)
+    window.history.replaceState(null, '', url)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -28,7 +40,12 @@ export function RunsPage() {
       <p className="subtitle">Latest pipeline run · main</p>
       {state.kind === 'loading' && <p role="status">Loading test runs…</p>}
       {state.kind === 'error' && <p role="alert">Could not load test runs: {state.message}</p>}
-      {state.kind === 'loaded' && <RunsTable runs={state.runs} />}
+      {state.kind === 'loaded' && (
+        <>
+          <StatusFilter value={filter} counts={countByStatus(state.runs)} onChange={changeFilter} />
+          <RunsTable runs={filterByStatus(state.runs, filter)} />
+        </>
+      )}
     </main>
   )
 }

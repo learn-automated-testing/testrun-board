@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatDuration, formatStartTime, sortByStartedAt } from '../../src/lib/runs'
+import {
+  countByStatus,
+  filterByStatus,
+  formatDuration,
+  formatStartTime,
+  parseStatusFilter,
+  sortByStartedAt,
+} from '../../src/lib/runs'
 import { runs } from '../mocks/data'
 
 describe('formatDuration', () => {
@@ -39,5 +46,40 @@ describe('sortByStartedAt', () => {
     const sorted = sortByStartedAt(shuffled)
     expect(sorted.map((r) => r.id)).toEqual(['r1', 'r4', 'r7'])
     expect(shuffled.map((r) => r.id)).toEqual(['r4', 'r1', 'r7'])
+  })
+})
+
+describe('filterByStatus', () => {
+  it('returns only runs with the selected status', () => {
+    expect(filterByStatus(runs, 'flaky').map((r) => r.file)).toEqual(['login.spec.ts', 'profile.spec.ts'])
+  })
+
+  it('returns every run for all', () => {
+    expect(filterByStatus(runs, 'all')).toHaveLength(7)
+  })
+
+  it('returns an empty list when no run has the status', () => {
+    expect(filterByStatus(runs.filter((r) => r.status === 'passed'), 'failed')).toEqual([])
+  })
+})
+
+describe('countByStatus', () => {
+  it('counts runs per status with the total under all', () => {
+    expect(countByStatus(runs)).toEqual({ all: 7, passed: 4, failed: 1, flaky: 2 })
+  })
+
+  it('returns zeros for no runs', () => {
+    expect(countByStatus([])).toEqual({ all: 0, passed: 0, failed: 0, flaky: 0 })
+  })
+})
+
+describe('parseStatusFilter', () => {
+  it('accepts every known filter', () => {
+    expect(['all', 'passed', 'failed', 'flaky'].map(parseStatusFilter)).toEqual(['all', 'passed', 'failed', 'flaky'])
+  })
+
+  it('falls back to all for an unknown or missing value', () => {
+    expect(parseStatusFilter('foo')).toBe('all')
+    expect(parseStatusFilter(null)).toBe('all')
   })
 })
