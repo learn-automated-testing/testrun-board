@@ -61,8 +61,12 @@ The `main` branch is the starting point. Exercises are described in [docs/exerci
 | Branch | Lesson |
 |---|---|
 | `solution/lesson-02-status-filter` | 2. Build your first feature with an agent |
+| `solution/lesson-13-pass-rate-tdd` | 13. Test-first with an agent |
+| `solution/lesson-16-pass-rate-column` | 16. Lab: your first quality feature (builds on lesson 13) |
+| `solution/lesson-22-flaky-history` | 22. Final project: flaky history panel (builds on lesson 16) |
 
 Compare your own result with a solution: `git diff main..solution/lesson-02-status-filter`.
+Each solution branch explains its decisions in `docs/solutions/` (the lesson 13 notes include the real red and green test runs).
 
 ## Requirements
 

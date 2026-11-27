@@ -14,11 +14,11 @@ Each exercise ends with `npm run check` green.
 | 8 | Add a step to the add-api-endpoint skill and observe the change in behaviour | `.claude/skills/` |
 | 9 | Let the agent verify the runs page through Playwright MCP, then codify it as an e2e test | `.mcp.json` |
 | 12 | Break `formatDuration`, ask the agent to "make the tests pass", review with the checklist | `docs/review-checklist.md` |
-| 13 | Write tests first for a `passRate()` function, confirm red, then implement | `tests/lib/` |
+| 13 | Write tests first for a `passRate()` function, confirm red, then implement | `tests/lib/` · solution: `solution/lesson-13-pass-rate-tdd` |
 | 14 | Build the history API and the panel in two worktrees, in parallel | `docs/specs/flaky-history.md` |
 | 15 | Try to edit `src/generated/api-types.ts` with the agent and read the hook message | `.claude/hooks/` |
-| 16 | Lab: deliver the pass-rate column with all gates green | `docs/specs/pass-rate-column.md` |
+| 16 | Lab: deliver the pass-rate column with all gates green | `docs/specs/pass-rate-column.md` · solution: `solution/lesson-16-pass-rate-column` |
 | 17 | Open a PR and see the four CI jobs; add a dependency without the label and watch the policy fail | `.github/workflows/checks.yml` |
 | 18 | Run the lesson 13 task on a local model and compare | - |
 | 21 | Run `npm run mutation`, look at the surviving mutants and add tests that kill them | `stryker.config.json` |
-| 22 | Final project: the flaky history panel, end to end | `docs/specs/flaky-history.md` |
+| 22 | Final project: the flaky history panel, end to end | `docs/specs/flaky-history.md` · solution: `solution/lesson-22-flaky-history` |
