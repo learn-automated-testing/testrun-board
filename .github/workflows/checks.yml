@@ -2,6 +2,8 @@ name: checks
 
 on:
   pull_request:
+    # labeled/unlabeled: adding the new-dependency label re-runs the agent policy
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
