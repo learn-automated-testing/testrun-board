@@ -46,3 +46,15 @@ export function sortByPassRate<T extends { file: string }>(
 export function passRatesByFile(histories: readonly { file: string; runs: readonly { status: 'passed' | 'failed' }[] }[]): Record<string, number | null> {
   return Object.fromEntries(histories.map((h) => [h.file, passRate(h.runs)]))
 }
+
+/** Start time of the most recent failed run (runs newest first), or null. */
+export function lastFailure(runs: readonly { status: 'passed' | 'failed'; startedAt: string }[]): string | null {
+  return runs.slice(0, HISTORY_WINDOW).find((run) => run.status === 'failed')?.startedAt ?? null
+}
+
+const dateFormat = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+
+/** Formats an ISO timestamp as a date, e.g. "26 Nov 2026" (UTC). */
+export function formatRunDate(iso: string): string {
+  return dateFormat.format(new Date(iso))
+}

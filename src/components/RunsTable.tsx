@@ -8,9 +8,10 @@ interface Props {
   passRates?: Readonly<Record<string, number | null>>
   passRateSort?: SortDirection | null
   onSortPassRate?: () => void
+  onOpenHistory?: (file: string) => void
 }
 
-export function RunsTable({ runs, passRates = {}, passRateSort = null, onSortPassRate }: Props) {
+export function RunsTable({ runs, passRates = {}, passRateSort = null, onSortPassRate, onOpenHistory }: Props) {
   if (runs.length === 0) {
     return <p role="status">No test runs found.</p>
   }
@@ -35,7 +36,13 @@ export function RunsTable({ runs, passRates = {}, passRateSort = null, onSortPas
           <tr key={run.id}>
             <td>{run.file}</td>
             <td>{run.suite}</td>
-            <td><StatusPill status={run.status} /></td>
+            <td>
+              <StatusPill
+                status={run.status}
+                historyFor={run.file}
+                onOpenHistory={onOpenHistory ? () => onOpenHistory(run.file) : undefined}
+              />
+            </td>
             <td>{formatPassRate(passRates[run.file] ?? null)}</td>
             <td>{formatDuration(run.durationMs)}</td>
             <td>{formatStartTime(run.startedAt)}</td>

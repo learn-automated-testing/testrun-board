@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatPassRate, passRate, passRatesByFile, sortByPassRate } from '../../src/lib/history'
+import { formatPassRate, formatRunDate, lastFailure, passRate, passRatesByFile, sortByPassRate } from '../../src/lib/history'
 import { history } from '../mocks/data'
 
 const runs = (pattern: string) =>
@@ -69,5 +69,25 @@ describe('passRatesByFile', () => {
       'profile.spec.ts': 0.7,
       'pricing.test.ts': null,
     })
+  })
+})
+
+describe('lastFailure', () => {
+  const at = (status: 'passed' | 'failed', day: number) => ({ status, startedAt: `2026-11-${day}T09:00:00.000Z` })
+
+  it('returns the start time of the most recent failed run', () => {
+    expect(lastFailure([at('passed', 26), at('failed', 25), at('failed', 24)])).toBe('2026-11-25T09:00:00.000Z')
+  })
+
+  it('returns null when no run failed or there are no runs', () => {
+    expect(lastFailure([at('passed', 26)])).toBeNull()
+    expect(lastFailure([])).toBeNull()
+  })
+})
+
+describe('formatRunDate', () => {
+  it('formats a timestamp as a UK date in UTC', () => {
+    expect(formatRunDate('2026-11-26T09:00:00Z')).toBe('26 Nov 2026')
+    expect(formatRunDate('2026-11-25T23:30:00Z')).toBe('25 Nov 2026')
   })
 })
