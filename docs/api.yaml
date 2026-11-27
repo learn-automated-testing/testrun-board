@@ -1,0 +1,47 @@
+openapi: 3.1.0
+info:
+  title: TestRun Board API
+  version: 1.0.0
+  description: >
+    Contract for the TestRun Board API. Types in src/generated/api-types.ts are
+    generated from this file with `npm run generate:api`. Never edit them by hand.
+paths:
+  /api/runs:
+    get:
+      summary: Test runs of the latest pipeline run
+      responses:
+        "200":
+          description: List of test runs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TestRun"
+components:
+  schemas:
+    Suite:
+      type: string
+      enum: [unit, api, e2e]
+    RunStatus:
+      type: string
+      enum: [passed, failed, flaky]
+    TestRun:
+      type: object
+      required: [id, file, suite, status, durationMs, startedAt]
+      properties:
+        id:
+          type: string
+        file:
+          type: string
+          description: Test file name, e.g. login.spec.ts
+        suite:
+          $ref: "#/components/schemas/Suite"
+        status:
+          $ref: "#/components/schemas/RunStatus"
+        durationMs:
+          type: integer
+          minimum: 0
+        startedAt:
+          type: string
+          format: date-time
